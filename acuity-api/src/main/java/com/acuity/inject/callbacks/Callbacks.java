@@ -3,10 +3,7 @@ package com.acuity.inject.callbacks;
 import com.acuity.api.AcuityInstance;
 import com.acuity.api.Events;
 import com.acuity.api.annotations.ClientInvoked;
-import com.acuity.api.rs.events.impl.ActionEvent;
-import com.acuity.api.rs.events.impl.GameStateChangeEvent;
-import com.acuity.api.rs.events.impl.GameTickEvent;
-import com.acuity.api.rs.events.impl.MouseRecorderUpdateEvent;
+import com.acuity.api.rs.events.impl.*;
 import com.acuity.api.rs.events.impl.drawing.GameDrawEvent;
 import com.acuity.api.rs.events.impl.drawing.InGameDrawEvent;
 import com.acuity.api.rs.utils.Game;
@@ -15,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 
 /**
  * Created by Zachary Herridge on 6/7/2017.
@@ -26,57 +22,80 @@ public class Callbacks {
 
     @ClientInvoked
     public static void fieldUpdating(String name, int index, Object instance) {
-        logger.trace("Field Updating: '{}' with index={} and instance={}", name, index, instance);
-        switch (name) {
-
+        try {
+            logger.trace("Field Updating: '{}' with index={} and instance={}", name, index, instance);
+            switch (name) {
+                case "tempVarps":
+                    break;
+            }
+        }
+        catch (Throwable e){
+            logger.error("Error during field updating callback.", e);
         }
     }
 
     @ClientInvoked
     public static void fieldUpdated(String name, int index, Object instance) {
-        logger.trace("Field Updated: '{}' with index={} and instance={}", name, index, instance);
-        switch (name) {
-            case "gameState":
-                Events.getRsEventBus().post(new GameStateChangeEvent(AcuityInstance.getClient().getGameState()));
-                break;
-            case "hitSplatsCyclesChanged":
-                try {
-                    logger.debug("Field Updated: '{}' with index={} and instance={}", name, index, instance);
-                    if (instance != null && instance instanceof RSPlayer && ((RSPlayer) instance).getWrapper() != null){
-                        System.out.println(((RSPlayer) instance).getName() + ": " + ((RSPlayer) instance).getWrapper().getHealthPercent());
-                    }
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-                break;
-            case "mouseYHistory":
-                try {
+        try {
+            logger.trace("Field Updated: '{}' with index={} and instance={}", name, index, instance);
+            switch (name) {
+                case "tempVarps":
+                    Events.getRsEventBus().post(new VarpChangeEvent(index));
+                    break;
+                case "gameState":
+                    Events.getRsEventBus().post(new GameStateChangeEvent(AcuityInstance.getClient().getGameState()));
+                    break;
+                case "mouseYHistory":
                     int lastX = AcuityInstance.getClient().getRsClient().getMouseRecorder().getMouseXHistory()[index];
                     int lastY = AcuityInstance.getClient().getRsClient().getMouseRecorder().getMouseYHistory()[index];
                     Events.getRsEventBus().post(new MouseRecorderUpdateEvent(System.currentTimeMillis(), lastX, lastY));
-                }
-                catch (Exception e){
-
-                }
-                break;
+                    break;
+            }
+        }
+        catch (Throwable e){
+            logger.error("Error during field update callback.", e);
         }
     }
 
     @ClientInvoked
-    public static void processActionCallback(int arg2, int arg3, int opcode, int arg1, String action, String target, int clickX, int clickY){
-        Events.getRsEventBus().post(new ActionEvent(opcode, arg1, arg2, arg3, action, target, clickX, clickY));
+    public static void insertMenuItemCallback(String action, String target, int opcode, int arg0, int arg1, int arg2){
+        try {
+            Events.getRsEventBus().post(new MenuInsertEvent(opcode, arg0, arg1, arg2, action, target));
+        }
+        catch (Throwable e){
+            logger.error("Error during process menu insert callback.", e);
+        }
+    }
+
+    @ClientInvoked
+    public static void processActionCallback(int arg1, int arg2, int opcode, int arg0, String action, String target, int clickX, int clickY){
+        try {
+            Events.getRsEventBus().post(new ActionEvent(opcode, arg0, arg1, arg2, action, target, clickX, clickY));
+        }
+        catch (Throwable e){
+            logger.error("Error during process action callback.", e);
+        }
     }
 
     @ClientInvoked
     public static void tick() {
-        GameTickEvent.incrementTick();
-        Events.getRsEventBus().post(GameTickEvent.INSTANCE);
+        try {
+            GameTickEvent.incrementTick();
+            Events.getRsEventBus().post(GameTickEvent.INSTANCE);
+        }
+        catch (Throwable e){
+            logger.error("Error during tick callback.", e);
+        }
     }
 
     @ClientInvoked
     public static void queueForWriteCallback(RSConnection connectionInstance, byte[] writeBuffer, int offset, int length){
-        logger.trace("Queued for write buffer={} offset={} length={}", writeBuffer == null ? "null" : "[" + writeBuffer.length + "]", offset, length);
+        try {
+            logger.trace("Queued for write buffer={} offset={} length={}", writeBuffer == null ? "null" : "[" + writeBuffer.length + "]", offset, length);
+        }
+        catch (Throwable e){
+            logger.error("Error during queue for write callback.", e);
+        }
     }
 
     @ClientInvoked
@@ -95,6 +114,11 @@ public class Callbacks {
     }
 
     @ClientInvoked
+    public static void addHitUpdateCallback(RSActor actor, int i, int i2, int i3, int i4, int i5, int i6){
+
+    }
+
+    @ClientInvoked
     public static void boundingBoxUpdated(RSRenderable rsRenderable, RSAxisAlignedBoundingBox rsAxisAlignedBoundingBox){
     }
 
@@ -108,8 +132,8 @@ public class Callbacks {
                 Events.getRsEventBus().post(new GameDrawEvent(image));
             }
         }
-        catch (Exception e){
-            logger.error("Error during drawing.", e);
+        catch (Throwable e){
+            logger.error("Error during draw callback.", e);
         }
     }
 }
