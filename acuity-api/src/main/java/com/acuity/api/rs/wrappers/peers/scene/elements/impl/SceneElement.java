@@ -4,8 +4,8 @@ import com.acuity.api.annotations.ClientInvoked;
 import com.acuity.api.rs.interfaces.Interactive;
 import com.acuity.api.rs.interfaces.Locatable;
 import com.acuity.api.rs.utils.UIDs;
+import com.acuity.api.rs.wrappers.common.locations.FineLocation;
 import com.acuity.api.rs.wrappers.common.locations.SceneLocation;
-import com.acuity.api.rs.wrappers.common.locations.StrictLocation;
 import com.acuity.api.rs.wrappers.common.locations.WorldLocation;
 import com.acuity.api.rs.wrappers.peers.rendering.Model;
 import com.acuity.api.rs.wrappers.peers.rendering.bounding_boxes.AxisAlignedBoundingBox;
@@ -41,12 +41,12 @@ public class SceneElement implements Locatable, Interactive, com.acuity.api.rs.w
     public Optional<Model> getModel() {
         return com.acuity.api.rs.wrappers.common.SceneElement.getModel(
                 rsSceneElement.getEntity(),
-                getStrictLocation(),
+                getFineLocation(),
                 getOrientation());
     }
 
     public int getFlag() {
-        // TODO: 7/11/2017  return rsSceneElement.getFlag();
+        //// TODO: 7/25/2017 Add flag hook
         return 0;
     }
 
@@ -54,16 +54,17 @@ public class SceneElement implements Locatable, Interactive, com.acuity.api.rs.w
         return rsSceneElement.getHeight();
     }
 
+    @Override
     public int getOrientation() {
         return rsSceneElement.getOrientation();
     }
 
-    public StrictLocation getStrictLocation(){
-        return new StrictLocation(rsSceneElement.getEndSceneX(), rsSceneElement.getEndSceneY(), rsSceneElement.getPlane()); // TODO: 7/1/2017 Rename
+    public FineLocation getFineLocation(){
+        return new FineLocation(rsSceneElement.getEndSceneX(), rsSceneElement.getEndSceneY(), rsSceneElement.getPlane());
     }
 
     public SceneLocation getSceneLocation() {
-        return getStrictLocation().getSceneLocation();
+        return getFineLocation().getSceneLocation();
     }
 
     @Override

@@ -5,8 +5,8 @@ import com.acuity.api.rs.interfaces.Interactive;
 import com.acuity.api.rs.interfaces.Locatable;
 import com.acuity.api.rs.utils.UIDs;
 import com.acuity.api.rs.wrappers.common.SceneElement;
+import com.acuity.api.rs.wrappers.common.locations.FineLocation;
 import com.acuity.api.rs.wrappers.common.locations.SceneLocation;
-import com.acuity.api.rs.wrappers.common.locations.StrictLocation;
 import com.acuity.api.rs.wrappers.common.locations.WorldLocation;
 import com.acuity.api.rs.wrappers.peers.rendering.Model;
 import com.acuity.api.rs.wrappers.peers.rendering.bounding_boxes.AxisAlignedBoundingBox;
@@ -30,10 +30,7 @@ public class SceneBoundaryDecor implements Locatable, Interactive, SceneElement 
         this.rsSceneBoundaryDecor = Preconditions.checkNotNull(peer);
     }
 
-    public int getRenderFlag(){
-        return rsSceneBoundaryDecor.getRenderFlag();
-    }
-
+    @Override
     public int getOrientation(){
         return rsSceneBoundaryDecor.getOrientation();
     }
@@ -42,12 +39,12 @@ public class SceneBoundaryDecor implements Locatable, Interactive, SceneElement 
         return new UIDs.UID(rsSceneBoundaryDecor.getUID());
     }
 
-    public StrictLocation getStrictLocation(){
-        return new StrictLocation(rsSceneBoundaryDecor.getSceneX(), rsSceneBoundaryDecor.getSceneY(), rsSceneBoundaryDecor.getPlane()); // TODO: 7/1/2017 Rename
+    public FineLocation getFineLocation(){
+        return new FineLocation(rsSceneBoundaryDecor.getSceneX(), rsSceneBoundaryDecor.getSceneY(), rsSceneBoundaryDecor.getPlane());
     }
 
     public SceneLocation getSceneLocation(){
-        return getStrictLocation().getSceneLocation();
+        return getFineLocation().getSceneLocation();
     }
 
     @Override
@@ -66,6 +63,11 @@ public class SceneBoundaryDecor implements Locatable, Interactive, SceneElement 
     }
 
     @Override
+    public int getFlag() {
+        return 0;
+    }
+
+    @Override
     public Optional<AxisAlignedBoundingBox> getBoundingBox() {
         return getRenderable().map(RSRenderable::getBoundingBox).map(RSAxisAlignedBoundingBox::getWrapper);
     }
@@ -74,7 +76,7 @@ public class SceneBoundaryDecor implements Locatable, Interactive, SceneElement 
     public Optional<Model> getModel() {
         return SceneElement.getModel(
                 getRenderable().orElse(null),
-                getStrictLocation(),
+                getFineLocation(),
                 getOrientation());
     }
 

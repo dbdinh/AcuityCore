@@ -1,17 +1,18 @@
 package com.acuity.api.rs.wrappers.peers.scene.actors.impl;
 
 import com.acuity.api.annotations.ClientInvoked;
-import com.acuity.api.rs.wrappers.peers.composite.PlayerComposite;
+import com.acuity.api.rs.utils.Prayers;
 import com.acuity.api.rs.wrappers.peers.scene.actors.Actor;
+import com.acuity.api.rs.wrappers.peers.types.PlayerType;
 import com.acuity.rs.api.RSPlayer;
-import com.acuity.rs.api.RSPlayerComposite;
+import com.acuity.rs.api.RSPlayerType;
 import com.google.common.base.Preconditions;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,25 +36,16 @@ public class Player extends Actor {
 		return getSkullIcon() == 0;
 	}
 
-	public Optional<PlayerComposite> getAppearance() {
-		return Optional.ofNullable(rsPlayer.getAppearance()).map(RSPlayerComposite::getWrapper);
+	public Optional<PlayerType> getAppearance() {
+		return Optional.ofNullable(rsPlayer.getAppearance()).map(RSPlayerType::getWrapper);
 	}
 
 	public int getCombatLevel() {
 		return rsPlayer.getCombatLevel();
 	}
 
-	/*
-	default = -1
-	magic = 2
-	ranged = 1
-	melee = 0
-	retribution = 3
-	redemption = 5
-	smite = 4
-	 */
-	public int getPrayerIcon() {
-		return rsPlayer.getPrayerIcon();
+	public Optional<Prayers.Prayer> getPrayerByOverhead() {
+		return Prayers.getPrayerByOverheadID(rsPlayer.getPrayerIcon());
 	}
 
 	//default value = -1
@@ -63,8 +55,7 @@ public class Player extends Actor {
 
 	//default value = 0
 	public int getTeam() {
-		// TODO: 7/11/2017  return rsPlayer.getTeam();
-		return 0;
+		return rsPlayer.getTeam();
 	}
 
 	public int getTotalLevel() {
@@ -77,8 +68,7 @@ public class Player extends Actor {
 
 	@Override
 	public List<String> getActions() {
-		// TODO: 7/12/2017  return Arrays.asList(rsPlayer.getActions());
-		return Collections.emptyList();
+		return Arrays.asList(rsPlayer.getActions());
 	}
 
 	@Nullable

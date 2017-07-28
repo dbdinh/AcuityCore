@@ -1,19 +1,14 @@
 package com.acuity.api.meta.tile_dumper;
 
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
 /**
  * Created by Zach on 7/12/2017.
  */
 public class DumpTile {
 
-    private String _id;
     private int x,y,z;
     private int flag;
 
     public DumpTile(int x, int y, int z, int flag) {
-        this._id = x + ":" + y + ":" + z;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -24,18 +19,16 @@ public class DumpTile {
         return flag;
     }
 
-    public Document toUpdate(){
-        Document update =  new Document("$set",
-                new Document()
-                        .append("x", x)
-                        .append("y", y)
-                        .append("z", z)
-                        .append("flag", flag));
-        return update;
+    public int getX() {
+        return x;
     }
 
-    public String getID() {
-        return _id;
+    public int getY() {
+        return y;
+    }
+
+    public int getPlane() {
+        return z;
     }
 
     @Override
@@ -46,9 +39,5 @@ public class DumpTile {
                 ", z=" + z +
                 ", flag=" + flag +
                 '}';
-    }
-
-    public boolean isLoaded() {
-        return false;
     }
 }
